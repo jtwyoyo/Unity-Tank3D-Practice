@@ -22,7 +22,6 @@ namespace MyCompany.Tank3D.Shell
 
         private void OnTriggerEnter(Collider other)
         {
-            // Find all the tanks in an area around the shell and damage them.
             Collider[] colliders = Physics.OverlapSphere(transform.position, m_ExplosionRadius, m_TankMask);
 
             for (int i = 0; i < colliders.Length; i++)
@@ -53,7 +52,6 @@ namespace MyCompany.Tank3D.Shell
 
         private float CalculateDamage(Vector3 targetPosition)
         {
-            // Calculate the amount of damage a target should take based on it's position.
             Vector3 explosionToTarget = targetPosition - transform.position;
 
             float explosionDistance = explosionToTarget.magnitude;

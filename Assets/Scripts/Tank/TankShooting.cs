@@ -40,7 +40,6 @@ namespace MyCompany.Tank3D.Tank
 
         private void Update()
         {
-            // Track the current state of the fire button and make decisions based on the current launch force.
             m_AimSlider.value = m_MinLaunchForce;
 
             if (m_CurrentLaunchForce >= m_MaxLaunchForce && !m_Fired)
@@ -71,7 +70,6 @@ namespace MyCompany.Tank3D.Tank
 
         private void Fire()
         {
-            // Instantiate and launch the shell.
             m_Fired = true;
 
             Rigidbody shellInstance = Instantiate(m_Shell, m_FireTransform.position, m_FireTransform.rotation) as Rigidbody;
