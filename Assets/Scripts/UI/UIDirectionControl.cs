@@ -1,22 +1,25 @@
 using UnityEngine;
 
-public class UIDirectionControl : MonoBehaviour
+namespace MyCompany.Tank3D.UI
 {
-    public bool m_UseRelativeRotation = true;  
-
-
-    private Quaternion m_RelativeRotation;     
-
-
-    private void Start()
+    public class UIDirectionControl : MonoBehaviour
     {
-        m_RelativeRotation = transform.parent.localRotation;
-    }
+        public bool m_UseRelativeRotation = true;
 
 
-    private void Update()
-    {
-        if (m_UseRelativeRotation)
-            transform.rotation = m_RelativeRotation;
+        private Quaternion m_RelativeRotation;
+
+
+        private void Start()
+        {
+            m_RelativeRotation = transform.parent.localRotation;
+        }
+
+
+        private void Update()
+        {
+            if (m_UseRelativeRotation)
+                transform.rotation = m_RelativeRotation;
+        }
     }
 }

@@ -1,68 +1,70 @@
 ﻿using UnityEngine;
+using MyCompany.Tank3D.Tank;
 
-public class ShellExplosion : MonoBehaviour
+namespace MyCompany.Tank3D.Shell
 {
-    public LayerMask m_TankMask;
-    public ParticleSystem m_ExplosionParticles;       
-    public AudioSource m_ExplosionAudio;              
-    public float m_MaxDamage = 100f;                  
-    public float m_ExplosionForce = 1000f;            
-    public float m_MaxLifeTime = 2f;                  
-    public float m_ExplosionRadius = 5f;              
-
-
-    private void Start()
+    public class ShellExplosion : MonoBehaviour
     {
-        Destroy(gameObject, m_MaxLifeTime);
-    }
+        [SerializeField] private LayerMask m_TankMask;
+        [SerializeField] private ParticleSystem m_ExplosionParticles;
+        [SerializeField] private AudioSource m_ExplosionAudio;
+        
+        private const float m_MaxDamage = 100f;
+        private const float m_ExplosionForce = 1000f;
+        private const float m_MaxLifeTime = 2f;
+        private const float m_ExplosionRadius = 5f;
 
-
-    private void OnTriggerEnter(Collider other)
-    {
-        // Find all the tanks in an area around the shell and damage them.
-        Collider[] colliders = Physics.OverlapSphere (transform.position, m_ExplosionRadius, m_TankMask);
-
-        for (int i = 0; i < colliders.Length; i++)
+        private void Start()
         {
-            Rigidbody targetRigidbody = colliders[i].GetComponent<Rigidbody>();
-
-            if(!targetRigidbody) continue;
-
-            targetRigidbody.AddExplosionForce(m_ExplosionForce, transform.position, m_ExplosionRadius);
-
-            TankHealth targetHealth = targetRigidbody.GetComponent<TankHealth>();
-
-            if (!targetHealth) continue;
-
-            float damage = CalculateDamage(targetRigidbody.position);
-
-            targetHealth.TakeDamage(damage);
+            Destroy(gameObject, m_MaxLifeTime);
         }
 
-        m_ExplosionParticles.transform.parent = null;
 
-        m_ExplosionParticles.Play();
+        private void OnTriggerEnter(Collider other)
+        {
+            // Find all the tanks in an area around the shell and damage them.
+            Collider[] colliders = Physics.OverlapSphere(transform.position, m_ExplosionRadius, m_TankMask);
 
-        m_ExplosionParticles.Play();
+            for (int i = 0; i < colliders.Length; i++)
+            {
+                Rigidbody targetRigidbody = colliders[i].GetComponent<Rigidbody>();
 
-        Destroy(m_ExplosionParticles.gameObject, m_ExplosionParticles.duration);
-        Destroy(gameObject);
-    }
+                if (!targetRigidbody) continue;
+
+                targetRigidbody.AddExplosionForce(m_ExplosionForce, transform.position, m_ExplosionRadius);
+
+                TankHealth targetHealth = targetRigidbody.GetComponent<TankHealth>();
+
+                if (!targetHealth) continue;
+
+                float damage = CalculateDamage(targetRigidbody.position);
+
+                targetHealth.TakeDamage(damage);
+            }
+
+            m_ExplosionParticles.transform.parent = null;
+
+            m_ExplosionParticles.Play();
+
+            Destroy(m_ExplosionParticles.gameObject, m_ExplosionParticles.duration);
+            Destroy(gameObject);
+        }
 
 
-    private float CalculateDamage(Vector3 targetPosition)
-    {
-        // Calculate the amount of damage a target should take based on it's position.
-        Vector3 explosionToTarget = targetPosition - transform.position;
+        private float CalculateDamage(Vector3 targetPosition)
+        {
+            // Calculate the amount of damage a target should take based on it's position.
+            Vector3 explosionToTarget = targetPosition - transform.position;
 
-        float explosionDistance = explosionToTarget.magnitude;
+            float explosionDistance = explosionToTarget.magnitude;
 
-        float relativeDistance = (m_ExplosionRadius - explosionDistance) / m_ExplosionRadius;
+            float relativeDistance = (m_ExplosionRadius - explosionDistance) / m_ExplosionRadius;
 
-        float damage = relativeDistance * m_MaxDamage;
+            float damage = relativeDistance * m_MaxDamage;
 
-        damage = Mathf.Max(0f, damage);
+            damage = Mathf.Max(0f, damage);
 
-        return damage;
+            return damage;
+        }
     }
 }
