@@ -6,6 +6,15 @@ using MyCompany.Tank3D.CameraScript;
 
 namespace MyCompany.Tank3D.Managers
 {
+    public struct GameConfig
+    {
+        public int RoundNumber;
+        public WaitForSeconds StartWait;
+        public WaitForSeconds EndWait;
+        public TankManager RoundWinner;
+        public TankManager GameWinner;
+    }
+
     public class GameManager : MonoBehaviour
     {
         [SerializeField] private CameraControl m_CameraControl;
@@ -18,18 +27,14 @@ namespace MyCompany.Tank3D.Managers
         private const float m_EndDelay = 3f;
         private const float k_MaxDepenetrationVelocity = float.PositiveInfinity;
 
-        private int m_RoundNumber;
-        private WaitForSeconds m_StartWait;
-        private WaitForSeconds m_EndWait;
-        private TankManager m_RoundWinner;
-        private TankManager m_GameWinner;
+        private GameConfig m_GameConfig;
 
         private void Awake()
         {
             Physics.defaultMaxDepenetrationVelocity = k_MaxDepenetrationVelocity;
 
-            m_StartWait = new WaitForSeconds(m_StartDelay);
-            m_EndWait = new WaitForSeconds(m_EndDelay);
+            m_GameConfig.StartWait = new WaitForSeconds(m_StartDelay);
+            m_GameConfig.EndWait = new WaitForSeconds(m_EndDelay);
 
             SpawnAllTanks();
             SetCameraTargets();
@@ -69,7 +74,7 @@ namespace MyCompany.Tank3D.Managers
             yield return StartCoroutine(RoundPlaying());
             yield return StartCoroutine(RoundEnding());
 
-            if (m_GameWinner != null)
+            if (m_GameConfig.GameWinner != null)
             {
                 SceneManager.LoadScene(0);
             }
@@ -89,10 +94,10 @@ namespace MyCompany.Tank3D.Managers
 
             m_CameraControl.SetStartPositionAndSize();
 
-            m_RoundNumber++;
-            m_MessageText.text = "ROUND " + m_RoundNumber;
+            m_GameConfig.RoundNumber++;
+            m_MessageText.text = "ROUND " + m_GameConfig.RoundNumber;
 
-            yield return m_StartWait;
+            yield return m_GameConfig.StartWait;
         }
 
 
@@ -113,18 +118,19 @@ namespace MyCompany.Tank3D.Managers
         {
             DisableTankControl();
 
-            m_RoundWinner = null;
+            m_GameConfig.RoundWinner = null;
 
-            m_RoundWinner = GetRoundWinner();
+            m_GameConfig.RoundWinner = GetRoundWinner();
 
-            if (m_RoundWinner != null) m_RoundWinner.m_Wins++;
+            if (m_GameConfig.RoundWinner != null)
+                m_GameConfig.RoundWinner.m_Wins++;
 
-            m_GameWinner = GetGameWinner();
+            m_GameConfig.GameWinner = GetGameWinner();
 
             string message = EndMessage();
             m_MessageText.text = message;
 
-            yield return m_EndWait;
+            yield return m_GameConfig.EndWait;
         }
 
 
@@ -170,8 +176,8 @@ namespace MyCompany.Tank3D.Managers
         {
             string message = "DRAW!";
 
-            if (m_RoundWinner != null)
-                message = m_RoundWinner.m_ColoredPlayerText + " WINS THE ROUND!";
+            if (m_GameConfig.RoundWinner != null)
+                message = m_GameConfig.RoundWinner.m_ColoredPlayerText + " WINS THE ROUND!";
 
             message += "\n\n\n\n";
 
@@ -180,8 +186,8 @@ namespace MyCompany.Tank3D.Managers
                 message += m_Tanks[i].m_ColoredPlayerText + ": " + m_Tanks[i].m_Wins + " WINS\n";
             }
 
-            if (m_GameWinner != null)
-                message = m_GameWinner.m_ColoredPlayerText + " WINS THE GAME!";
+            if (m_GameConfig.GameWinner != null)
+                message = m_GameConfig.GameWinner.m_ColoredPlayerText + " WINS THE GAME!";
 
             return message;
         }
